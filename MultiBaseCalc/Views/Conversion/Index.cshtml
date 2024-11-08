@@ -1,0 +1,56 @@
+﻿@using (Html.BeginForm("ConvertNumber", "Conversion", FormMethod.Post))
+{
+    <div>
+        <label>Число:</label>
+        <input type="text" name="number" />
+    </div>
+
+    <div>
+        <label>Вихідна система числення:</label>
+        <select name="fromBase">
+            @foreach (var baseValue in ViewBag.Bases as List<int>)
+            {
+                <option value="@baseValue">@baseValue</option>
+            }
+        </select>
+    </div>
+
+    <div>
+        <label>Цільова система числення:</label>
+        <select name="toBase">
+            @foreach (var baseValue in ViewBag.Bases as List<int>)
+            {
+                <option value="@baseValue">@baseValue</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit">Перевести</button>
+}
+
+@if (ViewBag.Result != null)
+{
+    <div>
+        <h3>Результат: @ViewBag.Result</h3>
+    </div>
+}
+
+@if (ViewBag.Error != null)
+{
+    <div>
+        <h3 style="color: red;">@ViewBag.Error</h3>
+    </div>
+}
+
+@if (ViewBag.PreviousResults != null && ViewBag.PreviousResults.Any())
+{
+    <div>
+        <h3>Попередні обчислення:</h3>
+        <ul>
+            @foreach (var result in ViewBag.PreviousResults as string[])
+            {
+                <li>@result</li>
+            }
+        </ul>
+    </div>
+}
