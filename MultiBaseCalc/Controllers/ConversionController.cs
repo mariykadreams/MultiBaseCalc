@@ -8,12 +8,15 @@ namespace MultiBaseCalc.Controllers
         // Форма для введення числа та систем числення
         public ActionResult Index()
         {
-            // Передаємо у ViewBag доступні системи числення
+            // Available number bases
             ViewBag.Bases = new List<int> { 2, 8, 10, 16 };
-            // Отримуємо попередні результати з сесії
-            ViewBag.PreviousResults = HttpContext.Session.GetString("PreviousResults")?.Split(';') ?? new string[] { };
+
+            // Retrieve previous results from session and split by ';'
+            ViewBag.PreviousResults = HttpContext.Session.GetString("PreviousResults")?.Split(';').ToList() ?? new List<string>();
+
             return View();
         }
+
 
         // Логіка переведення числа з однієї системи числення в іншу
         [HttpPost]

@@ -42,12 +42,12 @@
     </div>
 }
 
-@if (ViewBag.PreviousResults != null && ViewBag.PreviousResults.Any())
+@if (ViewBag.PreviousResults != null && ViewBag.PreviousResults.Count > 0)
 {
     <div>
         <h3>Попередні обчислення:</h3>
         <ul>
-            @foreach (var result in ViewBag.PreviousResults as string[])
+            @foreach (var result in ViewBag.PreviousResults as List<string>)
             {
                 <li>@result</li>
             }
