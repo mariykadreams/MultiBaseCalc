@@ -32,18 +32,16 @@ namespace MultiBaseCalc.Controllers
 
         private string GetDirectCode(int number, int bits)
         {
-            // Sign bit (0 for positive, 1 for negative)
             char signBit = number >= 0 ? '0' : '1';
-
-            // Get absolute value and convert to binary
             string binaryValue = Convert.ToString(Math.Abs(number), 2).PadLeft(bits - 1, '0');
 
-            // Ensure the binary number fits in the specified bits
             if (binaryValue.Length > bits - 1)
                 throw new Exception($"Number is too large for {bits}-bit representation");
 
-            return signBit + "." + binaryValue;
+            // Concatenate sign bit with binary representation
+            return signBit + binaryValue;
         }
+
 
         private string GetInverseCode(int number, int bits)
         {

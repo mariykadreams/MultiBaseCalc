@@ -18,45 +18,48 @@
         <p>Complement Code (Додатковий код): <span id="complementCode"></span></p>
     </div>
 </div>
-
 <script>
-    function calculate() {
+    async function calculate() {
         const number = document.getElementById('number').value;
         const bits = document.getElementById('bits').value;
 
-        // Add error handling for empty input
         if (!number) {
             alert('Please enter a number');
             return;
         }
 
-        fetch('/BinaryCode/Calculate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({ number: parseInt(number), bits: parseInt(bits || 8) })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                    return;
-                }
-                document.getElementById('directCode').textContent = data.directCode;
-                document.getElementById('inverseCode').textContent = data.inverseCode;
-                document.getElementById('complementCode').textContent = data.complementCode;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while calculating');
+        try {
+            const response = await fetch('/BinaryCode/Calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ number: parseInt(number), bits: parseInt(bits || 8) })
             });
+
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            const data = await response.json();
+
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+
+            document.getElementById('directCode').textContent = data.DirectCode;
+            document.getElementById('inverseCode').textContent = data.InverseCode;
+            document.getElementById('complementCode').textContent = data.ComplementCode;
+
+            console.log("Number:", number);
+            console.log("Direct Code (Прямий код):", data.DirectCode);
+            console.log("Inverse Code (Зворотний код):", data.InverseCode);
+            console.log("Complement Code (Додатковий код):", data.ComplementCode);
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while calculating');
+        }
     }
 
 </script>
+
