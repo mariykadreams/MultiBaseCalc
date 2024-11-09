@@ -1,7 +1,16 @@
 var builder = WebApplication.CreateBuilder(args);
 
 // Додаємо необхідні сервіси
-builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+builder.Services.AddControllersWithViews()
+    .AddRazorRuntimeCompilation()
+    .AddJsonOptions(options => {
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
+
+// Додаємо сесію
+builder.Services.AddDistributedMemoryCache();
+// ... rest of your configuration
+
 
 // Додаємо сесію
 builder.Services.AddDistributedMemoryCache(); // Використовуємо пам'ять для збереження сесії

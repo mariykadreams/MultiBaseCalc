@@ -1,0 +1,62 @@
+﻿@{
+    ViewData["Title"] = "Binary Code Calculator";
+}
+
+<div class="container">
+    <h2>Binary Code Calculator</h2>
+    <div class="form-group">
+        <label for="number">Enter Number:</label>
+        <input type="number" id="number" class="form-control" />
+        <label for="bits">Number of bits:</label>
+        <input type="number" id="bits" class="form-control" value="8" />
+        <button onclick="calculate()" class="btn btn-primary">Calculate</button>
+    </div>
+    <div id="result">
+        <h3>Results:</h3>
+        <p>Direct Code (Прямий код): <span id="directCode"></span></p>
+        <p>Inverse Code (Зворотний код): <span id="inverseCode"></span></p>
+        <p>Complement Code (Додатковий код): <span id="complementCode"></span></p>
+    </div>
+</div>
+
+<script>
+    function calculate() {
+        const number = document.getElementById('number').value;
+        const bits = document.getElementById('bits').value;
+
+        // Add error handling for empty input
+        if (!number) {
+            alert('Please enter a number');
+            return;
+        }
+
+        fetch('/BinaryCode/Calculate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ number: parseInt(number), bits: parseInt(bits || 8) })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                document.getElementById('directCode').textContent = data.directCode;
+                document.getElementById('inverseCode').textContent = data.inverseCode;
+                document.getElementById('complementCode').textContent = data.complementCode;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while calculating');
+            });
+    }
+
+</script>
