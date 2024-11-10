@@ -1,60 +1,27 @@
-﻿@{
-    ViewData["Title"] = "Binary Codes Calculator";
+﻿@model int
+@{
+    ViewBag.Title = "Binary Code Calculator";
 }
 
-<div class="container mt-5">
-    <h2>Binary Codes Calculator</h2>
+<h2>Binary Code Calculator</h2>
 
-    <div class="form-group mb-3">
-        <label for="number">Enter Number:</label>
-        <input type="number" id="number" class="form-control" required>
-    </div>
+<form method="post" action="/BinaryCode/CalculateCodes">
+    <label for="number">Enter a number:</label>
+    <input type="number" id="number" name="number" required>
+    <button type="submit">Calculate Codes</button>
+</form>
 
-    <div class="form-group mb-3">
-        <label for="bits">Number of Bits:</label>
-        <input type="number" id="bits" class="form-control" value="8" min="2" max="32">
-    </div>
+@if (ViewBag.Number != null)
+{
+    <h3>Results for input @ViewBag.Number (Результати для введеного числа @ViewBag.Number):</h3>
 
-    <button onclick="calculateCodes()" class="btn btn-primary">Calculate</button>
+    <h4>For +@Math.Abs(ViewBag.Number) (Для +@Math.Abs(ViewBag.Number)):</h4>
+    <p>Direct Code (Прямий код): @ViewBag.DirectCodePositive</p>
+    <p>Reverse Code (Зворотний код): @ViewBag.ReverseCodePositive</p>
+    <p>Additional Code (Додатковий код): @ViewBag.AdditionalCodePositive</p>
 
-    <div id="result" class="mt-4">
-        <div id="directCode"></div>
-        <div id="inverseCode"></div>
-        <div id="complementCode"></div>
-    </div>
-</div>
-
-@section Scripts {
-        <script>
-            function calculateCodes() {
-                const number = document.getElementById('number').value;
-                const bits = document.getElementById('bits').value;
-
-                fetch('/BinaryCode/Calculate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ number: parseInt(number), bits: parseInt(bits) })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        alert(data.error);
-                        return;
-                    }
-
-                    document.getElementById('directCode').innerHTML = 
-                        `<h4>Direct Code: ${data.directCode}</h4>`;
-                    document.getElementById('inverseCode').innerHTML = 
-                        `<h4>Inverse Code: ${data.inverseCode}</h4>`;
-                    document.getElementById('complementCode').innerHTML = 
-                        `<h4>Complement Code: ${data.complementCode}</h4>`;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while calculating the codes');
-                });
-            }
-        </script>
+    <h4>For -@Math.Abs(ViewBag.Number) (Для -@Math.Abs(ViewBag.Number)):</h4>
+    <p>Direct Code (Прямий код): @ViewBag.DirectCodeNegative</p>
+    <p>Reverse Code (Зворотний код): @ViewBag.ReverseCodeNegative</p>
+    <p>Additional Code (Додатковий код): @ViewBag.AdditionalCodeNegative</p>
 }

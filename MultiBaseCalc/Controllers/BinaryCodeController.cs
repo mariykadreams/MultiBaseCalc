@@ -10,97 +10,78 @@ namespace MultiBaseCalc.Controllers
         }
 
         [HttpPost]
-        public ActionResult Calculate(int number, int bits = 8)
+        public ActionResult CalculateCodes(int number)
         {
-            try
+            int positiveNumber = Math.Abs(number);
+            int negativeNumber = -positiveNumber;
+
+            // Codes for the positive equivalent of the input number
+            var directCodePositive = BinaryCodeCalculator.DirectCode(positiveNumber);
+            var reverseCodePositive = BinaryCodeCalculator.ReverseCode(positiveNumber);
+            var additionalCodePositive = BinaryCodeCalculator.AdditionalCode(positiveNumber);
+
+            // Codes for the negative equivalent of the input number
+            var directCodeNegative = BinaryCodeCalculator.DirectCode(negativeNumber);
+            var reverseCodeNegative = BinaryCodeCalculator.ReverseCode(negativeNumber);
+            var additionalCodeNegative = BinaryCodeCalculator.AdditionalCode(negativeNumber);
+
+            // Pass results to the view
+            ViewBag.Number = number;
+            ViewBag.DirectCodePositive = directCodePositive;
+            ViewBag.ReverseCodePositive = reverseCodePositive;
+            ViewBag.AdditionalCodePositive = additionalCodePositive;
+            ViewBag.DirectCodeNegative = directCodeNegative;
+            ViewBag.ReverseCodeNegative = reverseCodeNegative;
+            ViewBag.AdditionalCodeNegative = additionalCodeNegative;
+
+            return View("Index");
+        }
+    }
+
+    public static class BinaryCodeCalculator
+    {
+        public static string DirectCode(int number)
+        {
+            string binary = Convert.ToString(Math.Abs(number), 2).PadLeft(8, '0');
+            return (number >= 0 ? "0" : "1") + "." + binary;
+        }
+
+        public static string ReverseCode(int number)
+        {
+            if (number >= 0)
+                return DirectCode(number);
+
+            string direct = DirectCode(number).Split('.')[1];
+            char[] reversed = new char[direct.Length];
+            for (int i = 0; i < direct.Length; i++)
             {
-                if (bits < 2)
-                    throw new Exception("Number of bits must be at least 2");
+                reversed[i] = direct[i] == '0' ? '1' : '0';
+            }
 
-                if (!IsNumberInRange(number, bits))
-                    throw new Exception($"Number is too large for {bits}-bit representation");
+            return "1." + new string(reversed);
+        }
 
-                var result = new
+        public static string AdditionalCode(int number)
+        {
+            if (number >= 0)
+                return DirectCode(number);
+
+            char[] reversed = ReverseCode(number).Split('.')[1].ToCharArray();
+            for (int i = reversed.Length - 1; i >= 0; i--)
+            {
+                if (reversed[i] == '0')
                 {
-                    Number = number,
-                    DirectCode = GetDirectCode(number, bits),
-                    InverseCode = GetInverseCode(number, bits),
-                    ComplementCode = GetComplementCode(number, bits)
-                };
-
-                return Json(result);
-            }
-            catch (Exception ex)
-            {
-                return Json(new { error = ex.Message });
-            }
-        }
-
-        private bool IsNumberInRange(int number, int bits)
-        {
-            int maxValue = (1 << (bits - 1)) - 1;
-            int minValue = -(1 << (bits - 1));
-            return number >= minValue && number <= maxValue;
-        }
-
-        private string GetDirectCode(int number, int bits)
-        {
-            // Sign bit (0 for positive, 1 for negative)
-            char signBit = number >= 0 ? '0' : '1';
-
-            // Convert absolute value to binary, padding with zeros
-            string binaryValue = Convert.ToString(Math.Abs(number), 2).PadLeft(bits - 1, '0');
-
-            // Return sign bit and binary value
-            return signBit + "." + binaryValue;
-        }
-
-        private string GetInverseCode(int number, int bits)
-        {
-            if (number == 0)
-                return "0." + new string('0', bits - 1);
-
-            if (number > 0)
-                return GetDirectCode(number, bits);
-
-            string directCode = GetDirectCode(number, bits);
-            char[] inverseCode = directCode.ToCharArray();
-
-            // Invert all bits except sign bit and dot
-            for (int i = 2; i < inverseCode.Length; i++)
-            {
-                inverseCode[i] = inverseCode[i] == '0' ? '1' : '0';
+                    reversed[i] = '1';
+                    break;
+                }
+                else
+                {
+                    reversed[i] = '0';
+                }
             }
 
-            return new string(inverseCode);
+            return "1." + new string(reversed);
         }
-
-        private string GetComplementCode(int number, int bits)
-        {
-            if (number == 0)
-                return "0." + new string('0', bits - 1);
-
-            if (number > 0)
-                return GetDirectCode(number, bits);
-
-            // Get inverse code first
-            string inverseCode = GetInverseCode(number, bits);
-
-            // Split the code into parts
-            string[] parts = inverseCode.Split('.');
-            string binaryPart = parts[1];
-
-            // Convert binary part to integer and add 1
-            int inverseValue = Convert.ToInt32(binaryPart, 2);
-            int complementValue = inverseValue + 1;
-
-            // Convert back to binary and ensure proper length
-            string complementBinary = Convert.ToString(complementValue, 2)
-                .PadLeft(bits - 1, '0');
-
-            return "1." + complementBinary;
-        }
-
     }
 
 }
